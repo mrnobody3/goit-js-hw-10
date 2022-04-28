@@ -1,12 +1,15 @@
 import './css/styles.css';
 import debounce from 'lodash.debounce';
+import { fetchCountries } from './js/fetchCountries';
 const DEBOUNCE_DELAY = 300;
+// console.log(debounce);
 
 const searchBox = document.querySelector('#search-box');
-searchBox.addEventListener('input', debounce(onSearchByName), 1000);
+const countryList = document.querySelector('.country-lis');
+const countryInfo = document.querySelector('.country-info');
+searchBox.addEventListener('input', onSearchByName);
 
 function onSearchByName(e) {
-  console.log(e);
-  return fetch('https://restcountries.com/v2/all').then(r => console.log(r.json()));
+  console.log(e.currentTarget.value);
 }
-onSearchByName().then(r => console.log(r));
+console.log(fetchCountries('peru').then(r => console.log(r)));
