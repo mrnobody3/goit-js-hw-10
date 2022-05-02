@@ -1,42 +1,28 @@
 import './css/styles.css';
 import debounce from 'lodash.debounce';
+import Notiflix from 'notiflix';
+import { countryList, countryInfo, searchBox } from './js/refs';
 import { fetchCountries } from './js/fetchCountries';
+import { markupInfo, markupList, renderMarkup } from './js/markup';
 const DEBOUNCE_DELAY = 300;
 
-const searchBox = document.querySelector('#search-box');
-const countryList = document.querySelector('.country-lis');
-const countryInfo = document.querySelector('.country-info');
-searchBox.addEventListener('input', onSearchByName);
+searchBox.addEventListener('input', debounce(onSearchByName, DEBOUNCE_DELAY));
 
-function markupList(arr) {
-  return arr
-    .map(({ flags, name }) => {
-      return `<li class="country-item">
-        <img
-          class="country-img"
-          src="${flags.svg}"
-          alt="${name.official}"
-          width="25"
-          height="20"
-        />
-        <span>${name.official}</span>
-      </li>`;
-    })
-    .join('');
-}
 function onSearchByName(e) {
-  let value = e.currentTarget.value.trim();
-  fetchCountries(value)
+  let valueEl = e.target.value.trim();
+  renderMarkup(countryList);
+  renderMarkup(countryInfo);
+  fetchCountries(valueEl)
     .then(r => {
+      if (r.length > 12) {
+        return Notiflix.Notify.warning(
+          'Too many matches found. Please enter a more specific name.',
+        );
+      }
+      if (r.length === 1) {
+        return markupInfo(r);
+      }
       return markupList(r);
     })
-    .then(r => {
-      console.log(typeof r);
-      return renderMarkup(r);
-    })
-    .catch(error => console.error(error));
-}
-
-function renderMarkup(str = '') {
-  countryList.innerHTML = str;
+    .catch(Notiflix.Notify.failure('Oops, there is no country with that name'));
 }

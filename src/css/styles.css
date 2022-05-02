@@ -39,3 +39,6 @@ body {
 .data {
   display: flex;
 }
+.bold {
+  font-weight: 700;
+}
